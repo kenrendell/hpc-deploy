@@ -203,9 +203,9 @@ Always rebuild overlays manually after changes to the cluster.
 sudo wwctl overlay build
 ```
 
-### Slurm Installation
+## Slurm Installation
 
-#### Control node
+### Control node
 
 Install `slurmctld` on the control node.
 
@@ -258,7 +258,7 @@ sudo firewall-cmd --reload
 sudo firewall-cmd --list-all
 ```
 
-#### Other node
+### Other node
 
 First, run a shell inside a Warewulf container.
 
