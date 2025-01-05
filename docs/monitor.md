@@ -22,7 +22,7 @@ sudo chown -R prometheus:prometheus /var/lib/prometheus /etc/prometheus
 Download the latest release of `prometheus` for your platform, then extract. Precompiled binaries for released versions are available in the [download section](https://prometheus.io/download/) on [prometheus.io](https://prometheus.io/). See the [installation](https://prometheus.io/docs/prometheus/latest/installation/) section.
 
 ``` sh
-cd ~/src
+mkdir -p ~/src && cd ~/src
 wget https://github.com/prometheus/prometheus/releases/download/v3.1.0/prometheus-3.1.0.linux-amd64.tar.gz
 tar xvf prometheus-3.1.0.linux-amd64.tar.gz
 ```
@@ -50,6 +50,14 @@ scrape_configs:
 
     static_configs:
       - targets: ["localhost:9091"]
+
+  - job_name: node-exporter
+    static_configs:
+      - targets: ['10.0.2.1:9100']
+      - targets: ['10.0.2.2:9100']
+      - targets: ['10.0.2.3:9100']
+      - targets: ['10.0.2.4:9100']
+      - targets: ['10.0.2.5:9100']
 ```
 
 Create and edit the file `/etc/systemd/system/prometheus.service` with the following modifications.
@@ -129,4 +137,73 @@ Allow TCP port 3000 for `grafana-server` service.
 sudo firewall-cmd --permanent --zone=public --add-port=3000/tcp
 sudo firewall-cmd --reload
 sudo firewall-cmd --list-all
+```
+
+## Other nodes
+
+### Install Node Exporter
+
+#### Control node
+
+Download the latest release of `node_exporter` for your platform, then extract. Precompiled binaries for released versions are available in the [download section](https://prometheus.io/download/) on [prometheus.io](https://prometheus.io/).
+
+``` sh
+mkdir -p ~/src && cd ~/src
+wget https://github.com/prometheus/node_exporter/releases/download/v1.8.2/node_exporter-1.8.2.linux-amd64.tar.gz
+tar xvf node_exporter-1.8.2.linux-amd64.tar.gz
+```
+
+#### Other nodes
+
+Run a shell inside the Warewulf container of the compute node.
+
+``` sh
+sudo wwctl container shell --bind "${HOME}":/mnt 'rockylinux-8'
+```
+
+Install `node_exporter` on the system.
+
+``` sh
+command cp -f /mnt/src/node_exporter-1.8.2.linux-amd64/node_exporter /usr/local/bin
+chmod 755 /usr/local/bin/node_exporter
+```
+
+Create and edit the file `/etc/systemd/system/prometheus-node-exporter.service` with the following modifications.
+
+``` text
+[Unit]
+Description=Prometheus exporter for machine metrics
+Documentation=https://github.com/prometheus/node_exporter
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Restart=on-failure
+User=prometheus
+Group=prometheus
+ExecStart=/usr/local/bin/node_exporter
+ExecReload=/bin/kill -HUP $MAINPID
+TimeoutStopSec=20s
+SendSIGKILL=no
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Enable the `prometheus-node-exporter` service.
+
+``` sh
+systemctl enable prometheus-node-exporter.service
+```
+
+Exit Warewulf container shell with 0 exit status to force a rebuild.
+
+``` sh
+exit 0
+```
+
+Always rebuild overlays manually after changes to the cluster.
+
+``` sh
+sudo wwctl overlay build
 ```
