@@ -8,29 +8,29 @@ A check if the users of the host and container matches can be triggered with the
 
 ``` sh
 CONTAINER_NAME='rockylinux-8'
-wwctl container syncuser "${CONTAINER_NAME}"
+sudo wwctl container syncuser "${CONTAINER_NAME}"
 ```
 
 The *SlurmUser* `slurm` must exist prior to starting Slurm and must exist on all nodes of the cluster.
 
 ``` sh
 SLURM_USER='slurm'
-groupadd "${SLURM_USER}"
-useradd --no-create-home --comment 'Slurm Workload Manager' --gid "${SLURM_USER}" --shell '/sbin/nologin' --home-dir '/etc/slurm' "${SLURM_USER}"
+sudo groupadd --system "${SLURM_USER}"
+sudo useradd --system --comment 'Slurm Workload Manager' --gid "${SLURM_USER}" --shell '/sbin/nologin' --home-dir '/etc/slurm' "${SLURM_USER}"
 ```
 
 Also, create a dedicated non-privileged user account for MUNGE. The recommended user/group name for this account is `munge`. See [MUNGE general recommendations](https://github.com/dun/munge/wiki/Installation-Guide#general-recommendations).
 
 ``` sh
 MUNGE_USER='munge'
-groupadd "${MUNGE_USER}"
-useradd --no-create-home --comment "MUNGE Uid 'N' Gid Emporium" --gid "${MUNGE_USER}" --shell '/sbin/nologin' --home-dir '/run/munge' "${MUNGE_USER}"
+sudo groupadd --system "${MUNGE_USER}"
+sudo useradd --system --comment "MUNGE Uid 'N' Gid Emporium" --gid "${MUNGE_USER}" --shell '/sbin/nologin' --home-dir '/run/munge' "${MUNGE_USER}"
 ```
 
 With the `--write` flag it will update the container to match the user database of the host as described above. See warewulf docs about [syncuser](https://warewulf.org/docs/main/contents/containers.html#syncuser).
 
 ``` sh
-wwctl container syncuser --write --build "${CONTAINER_NAME}"
+sudo wwctl container syncuser --write --build "${CONTAINER_NAME}"
 ```
 
 Always rebuild overlays manually after changes to the cluster.
@@ -81,9 +81,9 @@ ntpstat
 Allow port for NTP service.
 
 ``` sh
-firewall-cmd --permanent --zone=public --add-service=ntp
-firewall-cmd --reload
-firewall-cmd --list-all
+sudo firewall-cmd --permanent --zone=public --add-service=ntp
+sudo firewall-cmd --reload
+sudo firewall-cmd --list-all
 ```
 
 #### Other nodes
@@ -170,7 +170,7 @@ sudo systemctl enable munge.service
 First, run a shell inside a Warewulf container (image that is used by other nodes).
 
 ``` sh
-wwctl container shell --bind /:/mnt 'rockylinux-8'
+sudo wwctl container shell --bind /:/mnt 'rockylinux-8'
 ```
 
 Install `munge`.
@@ -230,17 +230,17 @@ NodeName=n5 NodeAddr=10.0.2.5 CPUs=8 CoresPerSocket=4 ThreadsPerCore=2 RealMemor
 
 Specify the minimum processor count (CPUs), real memory space (RealMemory, megabytes), and temporary disk space (TmpDisk, megabytes) that a node should have to be considered available for use. Any node lacking these minimum configuration values will be considered DOWN and not scheduled. Use `lscpu` and `lsmem` commands to determine node specifications. See [Slurm configuration docs](https://slurm.schedmd.com/quickstart_admin.html#Config).
 
-`MpiDefault` identifies the default type of MPI to be used.  Srun may  override  this configuration  parameter  in any case.  Currently supported versions include: pmi2, pmix, and none. To see the acceptable types:
+`MpiDefault` identifies the default type of MPI to be used.  Srun may  override  this configuration  parameter  in any case. Currently supported versions include: pmi2, pmix, and none. To see the acceptable types:
 
 ``` sh
-srun --mpi=list
+sudo srun --mpi=list
 ```
 
 Create directories `/etc/slurm`, `/var/run/slurm`, `/var/spool/slurm`, and `/var/log/slurm`. Then, change the ownership of created directories to `SlurmUser`.
 
 ``` sh
-mkdir -p /etc/slurm /var/run/slurm /var/spool/slurm /var/log/slurm
-chown -R slurm:slurm /etc/slurm /var/run/slurm /var/spool/slurm /var/log/slurm
+sudo mkdir -p /etc/slurm /var/run/slurm /var/spool/slurm /var/log/slurm
+sudo chown -R slurm:slurm /etc/slurm /var/run/slurm /var/spool/slurm /var/log/slurm
 ```
 
 After editing the file `/etc/slurm/slurm.conf`, restart and enable the `slurmctld` service.
@@ -253,9 +253,9 @@ sudo systemctl enable slurmctld.service
 Allow TCP port 6817 for `slurmctld` service.
 
 ``` sh
-firewall-cmd --permanent --zone=public --add-port=6817/tcp
-firewall-cmd --reload
-firewall-cmd --list-all
+sudo firewall-cmd --permanent --zone=public --add-port=6817/tcp
+sudo firewall-cmd --reload
+sudo firewall-cmd --list-all
 ```
 
 #### Other node
@@ -263,7 +263,7 @@ firewall-cmd --list-all
 First, run a shell inside a Warewulf container.
 
 ``` sh
-wwctl container shell --bind /:/mnt 'rockylinux-8'
+sudo wwctl container shell --bind /:/mnt 'rockylinux-8'
 ```
 
 In compute node, install `slurmd`.
