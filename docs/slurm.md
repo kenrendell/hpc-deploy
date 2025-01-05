@@ -221,6 +221,7 @@ ClusterName=cain-hpc-proto
 SlurmctldHost=cain-hpc-proto
 SlurmctldAddr=10.0.0.1
 SlurmUser=slurm
+MpiDefault=pmi2
 ProctrackType=proctrack/cgroup
 ReturnToService=2
 NodeName=n[1-4] NodeAddr=10.0.2.[1-4] CPUs=4 CoresPerSocket=2 ThreadsPerCore=2 RealMemory=1024
@@ -228,6 +229,12 @@ NodeName=n5 NodeAddr=10.0.2.5 CPUs=8 CoresPerSocket=4 ThreadsPerCore=2 RealMemor
 ```
 
 Specify the minimum processor count (CPUs), real memory space (RealMemory, megabytes), and temporary disk space (TmpDisk, megabytes) that a node should have to be considered available for use. Any node lacking these minimum configuration values will be considered DOWN and not scheduled. Use `lscpu` and `lsmem` commands to determine node specifications. See [Slurm configuration docs](https://slurm.schedmd.com/quickstart_admin.html#Config).
+
+`MpiDefault` identifies the default type of MPI to be used.  Srun may  override  this configuration  parameter  in any case.  Currently supported versions include: pmi2, pmix, and none. To see the acceptable types:
+
+``` sh
+srun --mpi=list
+```
 
 Create directories `/etc/slurm`, `/var/run/slurm`, `/var/spool/slurm`, and `/var/log/slurm`. Then, change the ownership of created directories to `SlurmUser`.
 
@@ -297,4 +304,10 @@ Always rebuild overlays manually after changes to the cluster.
 
 ``` sh
 sudo wwctl overlay build
+```
+
+To print the node configuration, run the following command on the compute nodes.
+
+``` sh
+slurmd -C
 ```
