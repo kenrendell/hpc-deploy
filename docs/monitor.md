@@ -107,3 +107,26 @@ Always rebuild overlays manually after changes to the cluster.
 ``` sh
 sudo wwctl overlay build
 ```
+
+### Install Grafana
+
+Install `grafana` on the control node. See [Grafana setup docs](https://grafana.com/docs/grafana/latest/setup-grafana/).
+
+``` sh
+sudo dnf install -y grafana
+```
+
+Restart and enable the `grafana` service.
+
+``` sh
+sudo systemctl restart grafana-server.service
+sudo systemctl enable grafana-server.service
+```
+
+Allow TCP port 3000 for `grafana-server` service.
+
+``` sh
+sudo firewall-cmd --permanent --zone=public --add-port=3000/tcp
+sudo firewall-cmd --reload
+sudo firewall-cmd --list-all
+```
