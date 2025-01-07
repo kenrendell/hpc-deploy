@@ -33,6 +33,7 @@ Install `prometheus` on the system.
 cd ./prometheus-3.1.0.linux-amd64
 sudo command cp -f prometheus promtool /usr/local/bin
 sudo command cp -f prometheus.yml /etc/prometheus
+sudo chmod -R 644 /etc/prometheus && sudo find /etc/prometheus -type d -exec chmod 755 {} ';'
 sudo chmod 755 /usr/local/bin/prometheus /usr/local/bin/promtool
 ```
 
@@ -51,7 +52,7 @@ scrape_configs:
     static_configs:
       - targets: ["localhost:9091"]
 
-  - job_name: node-exporter
+  - job_name: "node-exporter"
     static_configs:
       - targets: ['10.0.2.1:9100']
       - targets: ['10.0.2.2:9100']

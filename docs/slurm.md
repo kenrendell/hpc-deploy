@@ -221,11 +221,22 @@ ClusterName=cain-hpc-proto
 SlurmctldHost=cain-hpc-proto
 SlurmctldAddr=10.0.0.1
 SlurmUser=slurm
-MpiDefault=pmi2
+
+MpiDefault=none
+
 ProctrackType=proctrack/cgroup
+TaskPlugin=task/affinity,task/cgroup
+
+SchedulerType=sched/backfill
+SelectType=select/cons_tres
+SelectTypeParameters=CR_CPU_Memory
+
 ReturnToService=2
-NodeName=n[1-4] NodeAddr=10.0.2.[1-4] CPUs=4 CoresPerSocket=2 ThreadsPerCore=2 RealMemory=1024
-NodeName=n5 NodeAddr=10.0.2.5 CPUs=8 CoresPerSocket=4 ThreadsPerCore=2 RealMemory=4096
+
+NodeName=n[1-4] NodeAddr=10.0.2.[1-4] CPUs=4 CoresPerSocket=2 ThreadsPerCore=2 RealMemory=7873 MemSpecLimit=2048
+NodeName=n5 NodeAddr=10.0.2.5 CPUs=8 CoresPerSocket=4 ThreadsPerCore=2 RealMemory=7873 MemSpecLimit=2048
+
+PartitionName=debug Nodes=ALL Default=YES MaxTime=INFINITE State=UP
 ```
 
 Specify the minimum processor count (CPUs), real memory space (RealMemory, megabytes), and temporary disk space (TmpDisk, megabytes) that a node should have to be considered available for use. Any node lacking these minimum configuration values will be considered DOWN and not scheduled. Use `lscpu` and `lsmem` commands to determine node specifications. See [Slurm configuration docs](https://slurm.schedmd.com/quickstart_admin.html#Config).
@@ -236,11 +247,29 @@ Specify the minimum processor count (CPUs), real memory space (RealMemory, megab
 sudo srun --mpi=list
 ```
 
+Also, modify the file `/etc/slurm/cgroup.conf` with the following modifications.
+
+``` text
+ConstrainCores=no
+ConstrainDevices=no
+
+#ConstrainRAMSpace=no
+ConstrainRAMSpace=yes
+ConstrainSwapSpace=yes
+AllowedRAMSpace=100
+AllowedSwapSpace=0
+
+#CgroupPlugin=autodetect
+#CgroupMountpoint=/sys/fs/cgroup
+```
+
 Create directories `/etc/slurm`, `/var/run/slurm`, `/var/spool/slurm`, and `/var/log/slurm`. Then, change the ownership of created directories to `SlurmUser`.
 
 ``` sh
 sudo mkdir -p /etc/slurm /var/run/slurm /var/spool/slurm /var/log/slurm
 sudo chown -R slurm:slurm /etc/slurm /var/run/slurm /var/spool/slurm /var/log/slurm
+sudo chown -R slurm:slurm /etc/slurm /var/run/slurm /var/spool/slurm /var/log/slurm
+sudo chmod -R 644 /etc/slurm && sudo find /etc/slurm -type d -exec chmod 755 {} ';'
 ```
 
 After editing the file `/etc/slurm/slurm.conf`, restart and enable the `slurmctld` service.
@@ -285,7 +314,7 @@ chown -R slurm:slurm /etc/slurm /var/run/slurm /var/spool/slurm /var/log/slurm
 Copy the file `/etc/slurm/slurm.conf` from the control node to the container.
 
 ``` sh
-command cp -fp /mnt/etc/slurm/slurm.conf /etc/slurm
+command cp -fp /mnt/etc/slurm/slurm.conf /mnt/etc/slurm/cgroup.conf /etc/slurm
 ```
 
 Enable the `slurmd` service.
