@@ -226,6 +226,7 @@ MpiDefault=none
 
 ProctrackType=proctrack/cgroup
 TaskPlugin=task/affinity,task/cgroup
+TmpFS=/run
 
 SchedulerType=sched/backfill
 SelectType=select/cons_tres
@@ -233,8 +234,8 @@ SelectTypeParameters=CR_CPU_Memory
 
 ReturnToService=2
 
-NodeName=n[1-4] NodeAddr=10.0.2.[1-4] CPUs=4 CoresPerSocket=2 ThreadsPerCore=2 RealMemory=7873 MemSpecLimit=2048
-NodeName=n5 NodeAddr=10.0.2.5 CPUs=8 CoresPerSocket=4 ThreadsPerCore=2 RealMemory=7873 MemSpecLimit=2048
+NodeName=n[1-4] NodeAddr=10.0.2.[1-4] CPUs=4 CoresPerSocket=2 ThreadsPerCore=2 RealMemory=7873 MemSpecLimit=2048 TmpDisk=2048
+NodeName=n5 NodeAddr=10.0.2.5 CPUs=8 CoresPerSocket=4 ThreadsPerCore=2 RealMemory=7873 MemSpecLimit=2048 TmpDisk=2048
 
 PartitionName=debug Nodes=ALL Default=YES MaxTime=INFINITE State=UP
 ```
@@ -258,9 +259,6 @@ ConstrainRAMSpace=yes
 ConstrainSwapSpace=yes
 AllowedRAMSpace=100
 AllowedSwapSpace=0
-
-#CgroupPlugin=autodetect
-#CgroupMountpoint=/sys/fs/cgroup
 ```
 
 Create directories `/etc/slurm`, `/var/run/slurm`, `/var/spool/slurm`, and `/var/log/slurm`. Then, change the ownership of created directories to `SlurmUser`.
