@@ -212,6 +212,7 @@ Install `slurmctld` on the control node.
 ``` sh
 sudo dnf install -y rocky-release-hpc
 sudo dnf install -y slurm23.11-slurmctld
+sudo dnf install -y openmpi
 ```
 
 Modify the file `/etc/slurm/slurm.conf` with the following modifications.
@@ -300,6 +301,7 @@ dnf install -y dnf-plugins-core
 dnf config-manager --set-enabled powertools
 dnf install -y rocky-release-hpc
 dnf install -y slurm23.11-slurmd
+dnf install -y openmpi
 ```
 
 Create directories `/etc/slurm`, `/var/run/slurm`, `/var/spool/slurm`, and `/var/log/slurm`. Then, change the ownership of created directories to `SlurmUser`.

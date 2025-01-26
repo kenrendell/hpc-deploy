@@ -1,0 +1,5 @@
+# Rocky Linux Installation
+
+## Partition
+
+
