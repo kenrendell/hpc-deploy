@@ -133,13 +133,13 @@ sudo wwctl overlay build
 
 ### Rebooting the nodes
 
-To shutdown all 5 nodes, run the following to make the wake-on-lan available for remote power-on.
+To shutdown all 5 nodes, run the following to make the `wake-on-lan` available for remote power-on.
 
 ``` sh
 sudo wwctl ssh n[1-5] 'ethtool -s eth0 wol g && poweroff'
 ```
 
-> Note: If the HPC server supports IPMI, it is better to use IPMI instead of wake-on-lan of NIC.
+> Note: If the HPC server supports `IPMI`, it is better to use `IPMI` instead of `wake-on-lan` of NIC.
 
 To power-on the nodes, run the script `ether-wake.sh`.
 
