@@ -50,13 +50,24 @@ To check if the system have SELinux enforcing, run `getenforce` or `sestatus`. I
 sudo restorecon -Rv /var/lib/tftpboot/
 ```
 
+When using `firewalld` with Warewulf, the following services are required to be added for successful node interconnectivity. See [Warewulf configuration guide](https://warewulf.org/docs/main/contents/configuration.html).
+
+``` sh
+sudo firewall-cmd --permanent --zone=public --add-service=warewulf
+sudo firewall-cmd --permanent --zone=public --add-service=dhcp
+sudo firewall-cmd --permanent --zone=public --add-service=nfs
+sudo firewall-cmd --permanent --zone=public --add-service=tftp
+sudo firewall-cmd --reload
+sudo firewall-cmd --list-all
+```
+
 ## Configure nodes
 
 Pull a basic node image from Docker Hub and import the default running kernel from the controller node and set both in the “default” node profile. See [Warewulf node images](https://github.com/warewulf/warewulf-node-images).
 
 ``` sh
-sudo wwctl container import --build docker://ghcr.io/warewulf/warewulf-rockylinux:8 rockylinux-8
-sudo wwctl profile set default --container rockylinux-8
+sudo wwctl container import --build docker://ghcr.io/warewulf/warewulf-rockylinux:8 'rockylinux-8'
+sudo wwctl profile set default --container 'rockylinux-8'
 ```
 
 Configure the default node profile, so that all nodes share the netmask and gateway configuration.
@@ -66,6 +77,19 @@ sudo wwctl profile set -y default --netmask=255.255.252.0 --gateway=10.0.0.1
 sudo wwctl profile list --all
 ```
 
+Update the container image.
+
+``` sh
+sudo wwctl container shell 'rockylinux-8'
+dnf update -y
+```
+
+Exit Warewulf container shell with 0 exit status to force a rebuild.
+
+``` sh
+exit 0
+```
+
 ### Add nodes
 
 Adding nodes can be done while setting configurations in one command. Node IP addresses should follow the IP addressing scheme discussed previously, and node names must be unique.
@@ -73,23 +97,40 @@ Adding nodes can be done while setting configurations in one command. Node IP ad
 ``` sh
 sudo wwctl node add n1 --ipaddr=10.0.2.1 --discoverable=true
 sudo wwctl node list -a n1
+sudo wwctl overlay build n1
+# Then, boot `n1' node
 
 sudo wwctl node add n2 --ipaddr=10.0.2.2 --discoverable=true
 sudo wwctl node list -a n2
+sudo wwctl overlay build n2
+# Then, boot `n2' node
 
 sudo wwctl node add n3 --ipaddr=10.0.2.3 --discoverable=true
 sudo wwctl node list -a n3
+sudo wwctl overlay build n3
+# Then, boot `n3' node
 
 sudo wwctl node add n4 --ipaddr=10.0.2.4 --discoverable=true
 sudo wwctl node list -a n4
+sudo wwctl overlay build n4
+# Then, boot `n4' node
 
 sudo wwctl node add n5 --ipaddr=10.0.2.5 --discoverable=true
 sudo wwctl node list -a n5
+sudo wwctl overlay build n5
+# Then, boot `n5' node
+
+# ... for other nodes
 ```
 
 Overlay autobuild has been broken at various times prior to v4.5.6; so it’s a reasonable practice to rebuild overlays manually after changes to the cluster.
 
 ``` sh
-# you can also supply an `n1` argument to build for the specific node
 sudo wwctl overlay build
+```
+
+## Controlling the nodes
+
+``` sh
+sudo wwctl ssh n[1-5] 'ethtool -s eth0 wol g && poweroff'
 ```
