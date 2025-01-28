@@ -61,7 +61,7 @@ server time.cloudflare.com iburst nts
 
 # Allow NTP client access from local network.
 #allow 192.168.0.0/16
-allow 10.0.0.0/8
+allow 10.0.0.0/22
 ```
 
 After editing the file `/etc/chrony.conf`, restart and enable the `chronyd` service.
@@ -91,7 +91,7 @@ sudo firewall-cmd --list-all
 First, run a shell inside a Warewulf container (image that is used by other nodes).
 
 ``` sh
-wwctl container shell 'rockylinux-8'
+sudo wwctl container shell 'rockylinux-8'
 ```
 
 The container image must be *writable* to allow interactive changes to the container image. See this [issue](https://warewulf.org/docs/main/contents/known-issues.html#containers-are-read-only), if the container image is *read-only*.
@@ -114,7 +114,7 @@ server 10.0.0.1 iburst minpoll 3 maxpoll 5
 
 # Allow NTP client access from local network.
 #allow 192.168.0.0/16
-allow 10.0.0.0/8
+allow 10.0.0.0/22
 ```
 
 After editing the file `/etc/chrony.conf`, enable the `chronyd` service.
@@ -135,11 +135,11 @@ Always rebuild overlays manually after changes to the cluster.
 sudo wwctl overlay build
 ```
 
-Check synchronization status with `chronyc` and `ntpstat`.
+Then, reboot the nodes. After reboot, check synchronization status with `chronyc` and `ntpstat`.
 
 ``` sh
-chronyc tracking
-ntpstat
+sudo wwctl ssh n[1-5] chronyc tracking
+sudo wwctl ssh n[1-5] ntpstat
 ```
 
 ### Install MUNGE for Authentication

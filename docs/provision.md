@@ -131,6 +131,24 @@ sudo wwctl overlay build
 
 ## Controlling the nodes
 
+### Rebooting the nodes
+
+To shutdown all 5 nodes, run the following to make the wake-on-lan available for remote power-on.
+
 ``` sh
 sudo wwctl ssh n[1-5] 'ethtool -s eth0 wol g && poweroff'
 ```
+
+> Note: If the HPC server supports IPMI, it is better to use IPMI instead of wake-on-lan of NIC.
+
+To power-on the nodes, run the following commands.
+
+``` sh
+# Power-on all Warewulf nodes
+ether-wake.sh
+
+# Power-on specific Warewulf nodes
+ether-wake.sh 1 3 5
+```
+
+https://github.com/kenrendell/hpc-deploy/blob/5a12866acb228fe1507e3e037c89f36ec5a55ce4/scripts/ether-wake.sh
