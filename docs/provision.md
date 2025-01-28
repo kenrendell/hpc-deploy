@@ -151,4 +151,4 @@ ether-wake.sh
 ether-wake.sh 1 3 5
 ```
 
-https://github.com/kenrendell/hpc-deploy/blob/5a12866acb228fe1507e3e037c89f36ec5a55ce4/scripts/ether-wake.sh#L1-
+https://github.com/kenrendell/hpc-deploy/blob/5a12866acb228fe1507e3e037c89f36ec5a55ce4/scripts/ether-wake.sh#L1-L21
