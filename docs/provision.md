@@ -145,10 +145,10 @@ To power-on the nodes, run the script `ether-wake.sh`.
 
 ``` sh
 # Power-on all Warewulf nodes
-sudo ether-wake.sh
+sudo ww-ether-wake.sh
 
 # Power-on specific Warewulf nodes
-sudo ether-wake.sh 1 3 5
+sudo ww-ether-wake.sh 1 3 5
 ```
 
 https://github.com/kenrendell/hpc-deploy/blob/5a12866acb228fe1507e3e037c89f36ec5a55ce4/scripts/ether-wake.sh#L1-L21
