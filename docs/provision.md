@@ -157,4 +157,4 @@ sudo ww-ether-wake.sh
 sudo ww-ether-wake.sh n1 n3 n5
 ```
 
-https://github.com/kenrendell/hpc-deploy/blob/5a12866acb228fe1507e3e037c89f36ec5a55ce4/scripts/ether-wake.sh#L1-L21
+https://github.com/kenrendell/hpc-deploy/blob/7b770fde65a1ec11284168f7a381f25a8c59a07b/scripts/ww-ether-wake.sh#L1-L21
