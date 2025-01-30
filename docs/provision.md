@@ -145,7 +145,7 @@ sudo ww-shutdown.sh n1 n3 n5
 
 https://github.com/kenrendell/hpc-deploy/blob/cf6485915aeb62124a06deecfecee2fe5a77c6db/scripts/ww-shutdown.sh#L1-L23
 
-> Note: If the HPC server supports `IPMI`, it is better to use `IPMI` instead of `wake-on-lan` of NIC.
+> Note: If the HPC server supports `IPMI`, it is better to use `IPMI` instead of `wake-on-lan` of NIC. See [Warewulf IPMI](https://warewulf.org/docs/main/contents/ipmi.html) guide.
 
 To power-on the nodes, run the script `ether-wake.sh`.
 
