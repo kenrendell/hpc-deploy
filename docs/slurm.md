@@ -203,6 +203,12 @@ Always rebuild overlays manually after changes to the cluster.
 sudo wwctl overlay build
 ```
 
+Then, reboot the nodes. After reboot, check if `munge` is configured properly.
+
+``` sh
+sudo wwctl ssh n[1-5] -- echo "$(munge -n)" \| unmunge
+```
+
 ## Slurm Installation
 
 ### Control node
@@ -210,6 +216,8 @@ sudo wwctl overlay build
 Install `slurmctld` on the control node.
 
 ``` sh
+sudo dnf install -y dnf-plugins-core
+sudo dnf config-manager --set-enabled powertools
 sudo dnf install -y rocky-release-hpc
 sudo dnf install -y slurm23.11-slurmctld
 sudo dnf install -y openmpi
@@ -266,7 +274,6 @@ Create directories `/etc/slurm`, `/var/run/slurm`, `/var/spool/slurm`, and `/var
 
 ``` sh
 sudo mkdir -p /etc/slurm /var/run/slurm /var/spool/slurm /var/log/slurm
-sudo chown -R slurm:slurm /etc/slurm /var/run/slurm /var/spool/slurm /var/log/slurm
 sudo chown -R slurm:slurm /etc/slurm /var/run/slurm /var/spool/slurm /var/log/slurm
 sudo chmod -R 644 /etc/slurm && sudo find /etc/slurm -type d -exec chmod 755 {} ';'
 ```
@@ -335,8 +342,8 @@ Always rebuild overlays manually after changes to the cluster.
 sudo wwctl overlay build
 ```
 
-To print the node configuration, run the following command on the compute nodes.
+Then, reboot the nodes. To print the node configuration, run the following command on the compute nodes.
 
 ``` sh
-slurmd -C
+sudo wwctl ssh n[1-5] -- slurmd -C
 ```

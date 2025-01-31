@@ -123,6 +123,13 @@ sudo wwctl overlay build n5
 # ... for other nodes
 ```
 
+After adding all the nodes, update the `/etc/hosts` file with the following command:
+
+``` sh
+sudo hostnamectl set-hostname 'cain-hpc-proto.localdomain'
+sudo wwctl configure hostfile
+```
+
 Overlay autobuild has been broken at various times prior to v4.5.6; so it’s a reasonable practice to rebuild overlays manually after changes to the cluster.
 
 ``` sh
