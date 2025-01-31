@@ -1,5 +1,6 @@
 #!/bin/sh
 # Usage: ww-shutdown.sh [node]...
+# Possible improvement: Parallelize the script
 
 [ "$(whoami)" = 'root' ] || \
 	{ printf 'Root permission is needed!\n'; exit 1; }
@@ -16,7 +17,7 @@ for _node in ${nodes}; do
 
 	ip_addr="$(printf '%s' "${_ip_addr}" | sed -E 's/(\.)/\\\1/g')" # escape special dot character
 
-	if_name="$(wwctl ssh "${_node}" -- ip -br -4 addr show \| sed -E -n 's/^[[:blank:]]*([[:alnum:]]+)[[:blank:]]+.+'"${ip_addr}"'.+$/\1/p')"
+	if_name="$(wwctl ssh "${_node}" -- ip -br -4 addr show | sed -E -n 's/^[[:blank:]]*'"${node}"':[[:blank:]]+([[:alnum:]]+)[[:blank:]]+.+'"${ip_addr}"'.+$/\1/p')"
 
 	# Enable wake-on-lan and shutdown
 	wwctl ssh "${_node}" -- ethtool -s "${if_name}" wol g '&&' poweroff

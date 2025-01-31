@@ -1,5 +1,6 @@
 #!/bin/sh
 # Usage: ww-ether-wake.sh [node]...
+# Possible improvement: Parallelize the script
 
 [ "$(whoami)" = 'root' ] || \
 	{ printf 'Root permission is needed!\n'; exit 1; }
