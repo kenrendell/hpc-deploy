@@ -10,7 +10,19 @@ To remotely access a server, it must be internet-accessible, typically via a sta
 
 - Go to `Menu` → `VPC networks` → `default` → `FIREWALLS`:
 
-  ![An image of firewall configuration](../assets/configure-vps-firewall-00.png)
+  ![Firewall configuration](../assets/configure-vps-firewall-00.png)
+
+- Select `ADD FIREWALL RULE`:
+
+  ![Firewall configuration](../assets/configure-vps-firewall-01.png)
+
+- next
+
+  ![Firewall configuration](../assets/configure-vps-firewall-02.png)
+
+- next
+
+  ![Firewall configuration](../assets/configure-vps-firewall-03.png)
 
 ``` sh
 ssh-add -L
