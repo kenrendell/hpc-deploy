@@ -24,6 +24,32 @@ To remotely access a server, it must be internet-accessible, typically via a sta
 
   ![Firewall configuration](../assets/configure-vps-firewall-03.png)
 
+#### Create a VPS Instance
+
+- next
+
+  ![VPS configuration](../assets/configure-vps-00.png)
+
+- next
+
+  ![VPS configuration](../assets/configure-vps-01.png)
+
+- next
+
+  ![VPS configuration](../assets/configure-vps-02.png)
+
+- next
+
+  ![VPS configuration](../assets/configure-vps-03.png)
+
+- next
+
+  ![VPS configuration](../assets/configure-vps-04.png)
+
+- next
+
+  ![VPS configuration](../assets/configure-vps-05.png)
+
 ``` sh
 ssh-add -L
 ```
