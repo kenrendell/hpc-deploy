@@ -96,6 +96,12 @@ sudo podman pull ghcr.io/wgeasy/wg-easy && sudo podman run --rm -it ghcr.io/wg-e
 
 Modify the files `/etc/containers/systemd/wg-easy.container` and `/etc/containers/systemd/wg-easy.volume` with the following contents:
 
+https://github.com/kenrendell/hpc-deploy/blob/626366d0c7eedc579d288a3a90f7790b1b29d171/containers/systemd/wg-easy.container#L1-L32
+
+https://github.com/kenrendell/hpc-deploy/blob/626366d0c7eedc579d288a3a90f7790b1b29d171/containers/systemd/wg-easy.volume#L1-L4
+
+Then, reload systemd and start `wg-easy` service.
+
 ``` sh
 sudo systemctl daemon-reload
 sudo systemctl restart wg-easy.service
