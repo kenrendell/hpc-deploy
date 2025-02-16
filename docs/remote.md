@@ -26,7 +26,7 @@ To remotely access a server, it must be internet-accessible, typically via a sta
 
 #### Create a VPS Instance
 
-- Set the VPS image (OS) to Rocky Linux 8:
+- Set the VPS image (OS) to Rocky Linux 9:
 
   ![VPS configuration](../assets/configure-vps-00.png)
 
@@ -44,6 +44,8 @@ To remotely access a server, it must be internet-accessible, typically via a sta
 
 - Secure the server, and add your SSH public keys:
 
+  > Disable `secure boot` if you want to avoid additional boot setup after a system upgrade.
+
   > To list the SSH public keys in your machine, run the command `ssh-add -L`.
 
   ![VPS configuration](../assets/configure-vps-04.png)
@@ -51,3 +53,50 @@ To remotely access a server, it must be internet-accessible, typically via a sta
 - Verify the configurations, then create the instance:
 
   ![VPS configuration](../assets/configure-vps-05.png)
+
+## Setup Wireguard VPN on VPS Server
+
+Update the system and install `wireguard-tools` and `podman`.
+
+``` sh
+sudo dnf config-manager --set-enabled crb
+sudo dnf update -y
+sudo dnf install -y podman ldns-utils bind-utils
+
+```
+
+Enable and start the `podman` service.
+
+``` sh
+sudo systemctl enable --now podman.service
+```
+
+Create the file `/etc/modules-load.d/wg-easy.conf` with the following necessary modules:
+
+``` text
+ip_tables
+iptable_filter
+iptable_nat
+wireguard
+xt_MASQUERADE
+```
+
+Define the necessary environment variables for `wg-easy` in `/etc/containers/systemd/wg-easy.env` file. Use `drill` instead of `dig`, if the version is greater than `1.8.0` (see [this](https://github.com/NLnetLabs/ldns/issues/28)) to find the WAN IP address.
+
+``` sh
+# WAN (public) IP address or Dynamic DNS hostname (clients will connect to)
+SERVER_IP_ADDR="$(dig +short myip.opendns.com @resolver1.opendns.com)"
+#SERVER_IP_ADDR="$(drill -Q myip.opendns.com @resolver1.opendns.com)"
+printf 'WG_HOST=%s\n' "${SERVER_IP_ADDR}" | sudo tee -a /etc/containers/systemd/wg-easy.env
+
+# Generate password hash
+PASSWORD='admin' # change this
+sudo podman pull ghcr.io/wgeasy/wg-easy && sudo podman run --rm -it ghcr.io/wg-easy/wg-easy wgpw "${PASSWORD}" | tr -d "[:space:][:cntrl:]'" | sudo tee -a /etc/containers/systemd/wg-easy.env
+```
+
+Modify the files `/etc/containers/systemd/wg-easy.container` and `/etc/containers/systemd/wg-easy.volume` with the following contents:
+
+``` sh
+sudo systemctl daemon-reload
+sudo systemctl restart wg-easy.service
+```
