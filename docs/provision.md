@@ -150,7 +150,7 @@ sudo ww-shutdown.sh
 sudo ww-shutdown.sh n1 n3 n5
 ```
 
-https://github.com/kenrendell/hpc-deploy/blob/c5b52c5a60776d65cd824af958a085ce69b1a3a3/scripts/ww-shutdown.sh#L1-L24
+https://github.com/kenrendell/hpc-deploy/blob/25c3cfcebea983604c9fec2870923069c60b2547/scripts/ww-shutdown.sh#L1-L24
 
 > Note: If the HPC server supports `IPMI`, it is better to use `IPMI` instead of `wake-on-lan` of NIC. See [Warewulf IPMI](https://warewulf.org/docs/main/contents/ipmi.html) guide.
 
