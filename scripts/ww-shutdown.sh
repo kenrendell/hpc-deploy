@@ -6,7 +6,7 @@
 	{ printf 'Root permission is needed!\n'; exit 1; }
 
 if [ "$#" -gt 0 ]; then nodes="$*"
-else nodes="$(wwctl node list --net | sed -E -n 's/^[[:blank:]]*([[:alnum:]\.]+)[[:blank:]]+.+$/\1/p')"; fi
+else nodes="$(wwctl node list --net | tail -n +2 | sed -E -n 's/^[[:blank:]]*([[:alnum:]\.]+)[[:blank:]]+.+$/\1/p')"; fi
 
 for _node in ${nodes}; do
 	node="$(printf '%s' "${_node}" | sed -E 's/(\.)/\\\1/g')" # escape special dot character

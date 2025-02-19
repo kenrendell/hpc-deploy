@@ -89,9 +89,12 @@ SERVER_IP_ADDR="$(dig +short myip.opendns.com @resolver1.opendns.com)"
 #SERVER_IP_ADDR="$(drill -Q myip.opendns.com @resolver1.opendns.com)"
 printf 'WG_HOST=%s\n' "${SERVER_IP_ADDR}" | sudo tee -a /etc/containers/systemd/wg-easy.env
 
+# Set MTU based on the server
+printf 'WG_MTU=%s\n' '1460' | sudo tee -a /etc/containers/systemd/wg-easy.env
+
 # Generate password hash
 PASSWORD='admin' # change this
-sudo podman pull ghcr.io/wgeasy/wg-easy && sudo podman run --rm -it ghcr.io/wg-easy/wg-easy wgpw "${PASSWORD}" | tr -d "[:space:][:cntrl:]'" | sudo tee -a /etc/containers/systemd/wg-easy.env
+sudo podman pull ghcr.io/wg-easy/wg-easy && sudo podman run --rm -it ghcr.io/wg-easy/wg-easy wgpw "${PASSWORD}" | tr -d "[:space:][:cntrl:]'" | sudo tee -a /etc/containers/systemd/wg-easy.env
 ```
 
 Modify the files `/etc/containers/systemd/wg-easy.container` and `/etc/containers/systemd/wg-easy.volume` with the following contents:
@@ -105,4 +108,44 @@ Then, reload systemd and start `wg-easy` service.
 ``` sh
 sudo systemctl daemon-reload
 sudo systemctl restart wg-easy.service
+```
+
+### Configure HTTPS
+
+Pull the `caddy` image to avoid waiting for systemd process to start.
+
+``` sh
+sudo podman pull docker.io/library/caddy
+```
+
+``` sh
+sudo systemctl daemon-reload
+sudo systemctl restart caddy.service
+```
+
+``` sh
+SERVER_IP_ADDR="$(dig +short myip.opendns.com @resolver1.opendns.com)"
+#SERVER_IP_ADDR="$(drill -Q myip.opendns.com @resolver1.opendns.com)"
+printf '\n%s {\n  reverse_proxy wg-easy:51821\n}\n' "${SERVER_IP_ADDR}" | sudo podman exec -i caddy tee -a /etc/caddy/Caddyfile
+sudo podman exec caddy systemctl reload caddy
+```
+
+Alternatively, edit the `/etc/caddy/Caddyfile` file if you want to change the server's IP address.
+
+``` sh
+sudo podman exec -it caddy vi /etc/caddy/Caddyfile
+sudo podman exec caddy systemctl reload caddy
+```
+
+## Wireguard on the Access Node
+
+``` sh
+sudo dnf install -y elrepo-release epel-release
+sudo dnf install -y wireguard-tools kmod-wireguard
+```
+
+``` sh
+sudo firewall-cmd --permanent --zone=public --add-port=51820/udp
+sudo firewall-cmd --reload
+sudo firewall-cmd --list-all
 ```
