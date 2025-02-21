@@ -130,6 +130,8 @@ printf 'PASSWORD_HASH=%s\n' "${PASSWORD_HASH}" | sudo tee -a /etc/containers/sys
 printf 'PROMETHEUS_METRICS_PASSWORD=%s\n' "${PASSWORD_HASH}" | sudo tee -a /etc/containers/systemd/wg-easy.env
 ```
 
+> To generate bcrypt hash, see [this](https://github.com/wg-easy/wg-easy/blob/master/How_to_generate_an_bcrypt_hash.md). Or use the `htpasswd` command from `httpd-tools` package.
+
 Modify the files `/etc/containers/systemd/wg-easy.container` and `/etc/containers/systemd/wg-easy.volume` with the following contents:
 
 https://github.com/kenrendell/hpc-deploy/blob/626366d0c7eedc579d288a3a90f7790b1b29d171/containers/systemd/wg-easy.volume#L1-L4
