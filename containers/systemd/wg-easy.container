@@ -3,7 +3,7 @@ Description=WireGuard VPN + Web-based Admin UI Container
 
 [Container]
 ContainerName=wg-easy
-Image=ghcr.io/wg-easy/wg-easy
+Image=ghcr.io/wg-easy/wg-easy:nightly
 PublishPort=51820:51820/udp
 PublishPort=51821:51821/tcp
 AddCapability=NET_ADMIN

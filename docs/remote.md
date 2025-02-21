@@ -61,8 +61,7 @@ Update the system and install `wireguard-tools` and `podman`.
 ``` sh
 sudo dnf config-manager --set-enabled crb
 sudo dnf update -y
-sudo dnf install -y podman ldns-utils bind-utils
-
+sudo dnf install -y podman ldns-utils bind-utils httpd-tools
 ```
 
 Enable and start the `podman` service.
@@ -81,20 +80,54 @@ wireguard
 xt_MASQUERADE
 ```
 
+Pull the `wg-easy` image to avoid waiting for systemd process to start.
+
+``` sh
+sudo podman pull ghcr.io/wg-easy/wg-easy:nightly
+```
+
 Define the necessary environment variables for `wg-easy` in `/etc/containers/systemd/wg-easy.env` file. Use `drill` instead of `dig`, if the version is greater than `1.8.0` (see [this](https://github.com/NLnetLabs/ldns/issues/28)) to find the WAN IP address.
 
 ``` sh
+sudo rm /etc/containers/systemd/wg-easy.env
+
 # WAN (public) IP address or Dynamic DNS hostname (clients will connect to)
 SERVER_IP_ADDR="$(dig +short myip.opendns.com @resolver1.opendns.com)"
 #SERVER_IP_ADDR="$(drill -Q myip.opendns.com @resolver1.opendns.com)"
 printf 'WG_HOST=%s\n' "${SERVER_IP_ADDR}" | sudo tee -a /etc/containers/systemd/wg-easy.env
 
-# Set MTU based on the server
-printf 'WG_MTU=%s\n' '1460' | sudo tee -a /etc/containers/systemd/wg-easy.env
+# Ethernet device the wireguard traffic should be forwarded through.
+INTERFACE='eth0'
+printf 'WG_DEVICE=%s\n' "${INTERFACE}" | sudo tee -a /etc/containers/systemd/wg-easy.env
 
-# Generate password hash
+# The MTU the clients will use.
+MTU="$(cat "/sys/class/net/${INTERFACE}/mtu")"
+printf 'WG_MTU=%s\n' "${MTU}" | sudo tee -a /etc/containers/systemd/wg-easy.env
+
+# Value in seconds to keep the "connection" open. If this value is 0, then connections won't be kept alive.
+printf 'WG_PERSISTENT_KEEPALIVE=%s\n' '25' | sudo tee -a /etc/containers/systemd/wg-easy.env
+
+# Allowed IPs clients will use.
+printf 'WG_ALLOWED_IPS=%s\n' '10.8.0.0/24' | sudo tee -a /etc/containers/systemd/wg-easy.env
+
+# Enable display and generation of short one time download links (expire after 5 minutes)
+printf 'WG_ENABLE_ONE_TIME_LINKS=%s\n' 'true' | sudo tee -a /etc/containers/systemd/wg-easy.env
+
+# The maximum age of Web UI sessions in minutes. 0 means that the session will exist until the browser is closed.
+printf 'MAX_AGE=%s\n' '15' | sudo tee -a /etc/containers/systemd/wg-easy.env
+
+# Enable Prometheus metrics http://0.0.0.0:51821/metrics and http://0.0.0.0:51821/metrics/json
+printf 'ENABLE_PROMETHEUS_METRICS=%s\n' 'true' | sudo tee -a /etc/containers/systemd/wg-easy.env
+
+# Generate the password hash
 PASSWORD='admin' # change this
-sudo podman pull ghcr.io/wg-easy/wg-easy && sudo podman run --rm -it ghcr.io/wg-easy/wg-easy wgpw "${PASSWORD}" | tr -d "[:space:][:cntrl:]'" | sudo tee -a /etc/containers/systemd/wg-easy.env
+PASSWORD_HASH="$(sudo podman run --rm -it ghcr.io/wg-easy/wg-easy:nightly wgpw "${PASSWORD}" | tr -d "[:space:][:cntrl:]'" | cut -d '=' -f 2)"
+
+# Set the password hash for WireGuard UI
+printf 'PASSWORD_HASH=%s\n' "${PASSWORD_HASH}" | sudo tee -a /etc/containers/systemd/wg-easy.env
+
+# Set the password hash for WireGuard Prometheus metrics
+printf 'PROMETHEUS_METRICS_PASSWORD=%s\n' "${PASSWORD_HASH}" | sudo tee -a /etc/containers/systemd/wg-easy.env
 ```
 
 Modify the files `/etc/containers/systemd/wg-easy.container` and `/etc/containers/systemd/wg-easy.volume` with the following contents:
