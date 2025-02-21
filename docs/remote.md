@@ -134,7 +134,7 @@ Modify the files `/etc/containers/systemd/wg-easy.container` and `/etc/container
 
 https://github.com/kenrendell/hpc-deploy/blob/626366d0c7eedc579d288a3a90f7790b1b29d171/containers/systemd/wg-easy.volume#L1-L4
 
-https://github.com/kenrendell/hpc-deploy/blob/626366d0c7eedc579d288a3a90f7790b1b29d171/containers/systemd/wg-easy.container#L1-L32
+https://github.com/kenrendell/hpc-deploy/blob/2236cf2e07896a02cb672e458a14c90c9446d8e1/containers/systemd/wg-easy.container#L1-L32
 
 Then, reload systemd and start `wg-easy` service.
 
