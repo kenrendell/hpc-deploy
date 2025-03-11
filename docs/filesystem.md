@@ -169,6 +169,10 @@ pvfs2-genconfig --quiet --protocol tcp --ioservers "${SERVERS}" --metaservers "$
 
 Create the service files `orangefs-server.service` and `orangefs-server-create-storage-space.service` under the directory `/etc/systemd/system/`:
 
+https://github.com/kenrendell/hpc-deploy/blob/b18b206ccd69ea995dc6d004b15ea405f2ab4f22/systemd/orangefs-server-create-storage.service#L1-L10
+
+https://github.com/kenrendell/hpc-deploy/blob/b18b206ccd69ea995dc6d004b15ea405f2ab4f22/systemd/orangefs-server.service#L1-L11
+
 Enable the `orangefs-server.service` and `orangefs-server-create-storage-space.service`.
 
 ``` sh
