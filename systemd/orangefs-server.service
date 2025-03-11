@@ -1,0 +1,11 @@
+[Unit]
+Description=OrangeFS Parallel File System Server
+After=network.target
+After=orangefs-server-create-storage.service
+
+[Service]
+Type=simple
+ExecStart=/usr/sbin/pvfs2-server -d /etc/orangefs/orangefs.conf
+
+[Install]
+WantedBy=multi-user.target

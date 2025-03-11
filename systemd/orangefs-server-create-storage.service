@@ -1,0 +1,10 @@
+[Unit]
+Description=Create the storage space for OrangeFS
+After=local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/pvfs2-server -f /etc/orangefs/orangefs.conf
+
+[Install]
+WantedBy=multi-user.target
