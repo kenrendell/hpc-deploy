@@ -176,7 +176,7 @@ sudo podman exec caddy systemctl reload caddy
 
 ``` sh
 sudo dnf install -y elrepo-release epel-release
-sudo dnf install -y wireguard-tools kmod-wireguard
+sudo dnf install -y wireguard-tools
 ```
 
 ``` sh

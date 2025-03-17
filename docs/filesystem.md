@@ -1,4 +1,4 @@
-# Parallel File System
+# File System
 
 ## Prepare Disk Provisioning Tools on Compute nodes
 
@@ -43,6 +43,7 @@ To save space, remove some previously installed packages except `ignition` and `
 
 ``` sh
 rm -rf /tmp/ignition /tmp/go*
+rm -rf /root/.cache # go-build cache
 dnf group remove -y "Development Tools"
 ```
 
@@ -141,7 +142,7 @@ sudo wwctl overlay build
 sudo wwctl server restart
 ```
 
-## OrangeFS Installation
+## OrangeFS Installation (Parallel File System)
 
 ### Compute nodes
 
@@ -194,4 +195,105 @@ sudo ww-shutdown.sh
 sudo ww-ether-wake.sh
 ```
 
+To verify the OrangeFS servers, run the command `pvfs2-check-server`:
+
+``` sh
+# There is no outputs if successful
+sudo wwctl ssh n[1-5] -- pvfs2-check-server -h localhost -f orangefs -n tcp -p 3334
+```
+
 ### Mount OrangeFS Storage on the Access node
+
+Install the OrangeFS client.
+
+``` sh
+sudo dnf install -y epel-release
+sudo dnf install -y orangefs
+```
+
+Automatically load the kernel module `orangefs`.
+
+``` sh
+echo orangefs | sudo tee /etc/modules-load.d/orangefs.conf
+```
+
+Modify `/etc/pvfs2tab` to mount the OrangeFS storage servers.
+ 
+``` sh
+sudo mkdir /scratch
+HOST='n1' # any OrangeFS storage server
+echo "tcp://${HOST}:3334/orangefs /scratch pvfs2 defaults,noauto 0 0" | sudo tee /etc/pvfs2tab
+```
+
+Enable the service `orangefs-client`.
+
+``` sh
+sudo systemctl enable orangefs-client.service
+sudo systemctl restart orangefs-client.service
+```
+
+Test connectivity to the OrangeFS server.
+
+``` sh
+pvfs2-ping -m /scratch
+```
+
+To mount the OrangeFS storage server, use the following command:
+
+``` sh
+# The filesystem type `pvfs2' is only available when the `orangefs' kernel module is loaded.
+sudo mount -t pvfs2 "tcp://n1:3334/orangefs" /mnt/orangefs
+```
+
+## Configure Storage nodes
+
+Pull a basic node image from Docker Hub and import the default running kernel from the controller node and set both in the “storage” node profile. See [Warewulf node images](https://github.com/warewulf/warewulf-node-images). Use Rocky Linux 9 for storage nodes.
+
+``` sh
+sudo wwctl container import --build docker://ghcr.io/warewulf/warewulf-rockylinux:9 'rockylinux-9-storage'
+sudo wwctl profile add storage --container 'rockylinux-9-storage'
+```
+
+Configure the storage node profile, so that all storage nodes share the netmask and gateway configuration.
+
+``` sh
+sudo wwctl profile set -y storage --netmask=255.255.252.0 --gateway=10.0.0.1
+sudo wwctl profile list --all
+```
+
+Update the container image.
+
+``` sh
+sudo wwctl container shell 'rockylinux-9-storage'
+dnf update -y
+dnf remove -y --oldinstallonly
+```
+
+Install disk provisioning tools.
+
+``` sh
+dnf install -y gdisk ignition xfsprogs
+```
+
+Exit Warewulf container shell with 0 exit status to force a rebuild.
+
+``` sh
+exit 0
+```
+
+### Add Storage nodes
+
+``` sh
+sudo wwctl node add s1 --profile=storage --ipaddr=10.0.2.100 --discoverable=true
+sudo wwctl node list -a s1
+sudo wwctl overlay build s1
+# Then, boot `s1' node
+
+# ... for other nodes
+```
+
+After adding all the storage nodes, update the `/etc/hosts` file with the following command:
+
+``` sh
+sudo wwctl configure hostfile
+```

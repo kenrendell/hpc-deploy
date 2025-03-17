@@ -82,6 +82,7 @@ Update the container image.
 ``` sh
 sudo wwctl container shell 'rockylinux-8'
 dnf update -y
+dnf remove -y --oldinstallonly
 ```
 
 Exit Warewulf container shell with 0 exit status to force a rebuild.
