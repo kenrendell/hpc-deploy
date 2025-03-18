@@ -217,6 +217,8 @@ Automatically load the kernel module `orangefs`.
 echo orangefs | sudo tee /etc/modules-load.d/orangefs.conf
 ```
 
+> The filesystem type `pvfs2` is only available when the `orangefs` kernel module is loaded.
+
 Modify `/etc/pvfs2tab` to mount the OrangeFS storage servers.
  
 ``` sh
@@ -238,11 +240,16 @@ Test connectivity to the OrangeFS server.
 pvfs2-ping -m /scratch
 ```
 
-To mount the OrangeFS storage server, use the following command:
+Create the mount service file `orangefs-server.mount` under the directory `/etc/systemd/system/`:
+
+https://github.com/kenrendell/hpc-deploy/blob/1c05ebf368d64dfea0c84c7fd66d3df6e9ad713d/systemd/orangefs-server.mount#L1-L13
+
+Enable the mount service for OrangeFS server.
 
 ``` sh
-# The filesystem type `pvfs2' is only available when the `orangefs' kernel module is loaded.
-sudo mount -t pvfs2 "tcp://n1:3334/orangefs" /mnt/orangefs
+HOST='n1' # defined hostname of the OrangeFS server in /etc/pvfs2tab
+sudo systemctl enable orangefs-server@n1.mount
+sudo systemctl restart orangefs-server@n1.mount
 ```
 
 ## Configure Storage nodes
