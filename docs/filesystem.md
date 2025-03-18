@@ -242,7 +242,7 @@ pvfs2-ping -m /scratch
 
 Create the mount service file `orangefs-scratch.mount` under the directory `/etc/systemd/system/`. Modify the location `tcp://<hostname>:3334/orangefs` to match the configuration in `/etc/pvfs2tab`.
 
-https://github.com/kenrendell/hpc-deploy/blob/1c05ebf368d64dfea0c84c7fd66d3df6e9ad713d/systemd/orangefs-server.mount#L1-L13
+https://github.com/kenrendell/hpc-deploy/blob/68595f7c0a5d4c774b5e9ab564383f9f2da2175f/systemd/orangefs-scratch.mount#L1-L13
 
 Enable the mount service for OrangeFS storage server.
 
