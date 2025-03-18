@@ -1,12 +1,12 @@
 [Unit]
-Description=Mount OrangeFS on %I
+Description=Mount OrangeFS server
 Requires=orangefs-client.service
 Requires=network-online.target
 After=network-online.target
 
 [Mount]
-What=tcp://%I:3334/orangefs
 Where=/scratch
+What=tcp://n1:3334/orangefs
 Type=pvfs2
 
 [Install]

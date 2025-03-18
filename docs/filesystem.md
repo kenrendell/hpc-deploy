@@ -240,16 +240,16 @@ Test connectivity to the OrangeFS server.
 pvfs2-ping -m /scratch
 ```
 
-Create the mount service file `orangefs-server.mount` under the directory `/etc/systemd/system/`:
+Create the mount service file `orangefs-scratch.mount` under the directory `/etc/systemd/system/`. Modify the location `tcp://<hostname>:3334/orangefs` to match the configuration in `/etc/pvfs2tab`.
 
 https://github.com/kenrendell/hpc-deploy/blob/1c05ebf368d64dfea0c84c7fd66d3df6e9ad713d/systemd/orangefs-server.mount#L1-L13
 
-Enable the mount service for OrangeFS server.
+Enable the mount service for OrangeFS storage server.
 
 ``` sh
-HOST='n1' # defined hostname of the OrangeFS server in /etc/pvfs2tab
-sudo systemctl enable orangefs-server@n1.mount
-sudo systemctl restart orangefs-server@n1.mount
+sudo systemctl daemon-reload
+sudo systemctl enable "orangefs-scratch.mount"
+sudo systemctl restart "orangefs-scratch.mount"
 ```
 
 ## Configure Storage nodes
