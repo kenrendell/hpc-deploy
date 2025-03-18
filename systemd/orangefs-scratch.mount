@@ -1,5 +1,5 @@
 [Unit]
-Description=Mount OrangeFS server
+Description=OrangeFS server
 Requires=orangefs-client.service
 Requires=network-online.target
 After=network-online.target

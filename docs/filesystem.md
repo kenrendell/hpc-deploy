@@ -248,8 +248,8 @@ Enable the mount service for OrangeFS storage server.
 
 ``` sh
 sudo systemctl daemon-reload
-sudo systemctl enable "orangefs-scratch.mount"
-sudo systemctl restart "orangefs-scratch.mount"
+sudo systemctl enable scratch.mount
+sudo systemctl restart scratch.mount
 ```
 
 ## Configure Storage nodes
