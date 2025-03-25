@@ -6,7 +6,7 @@ To remotely access a server, it must be internet-accessible, typically via a sta
 
 ### Google Cloud
 
-#### Configure VPC Network Firewall
+#### Configure Firewall for WireGuard VPN
 
 - Go to `Menu` → `VPC networks`, then select the network `default`, and go to the `FIREWALLS`:
 
@@ -23,6 +23,24 @@ To remotely access a server, it must be internet-accessible, typically via a sta
 - Save and verify the changes:
 
   ![Firewall configuration](../assets/configure-vps-firewall-03.png)
+
+#### Configure Firewall for RustDesk Server (Optional)
+
+- Go to `Menu` → `VPC networks`, then select the network `default`, and go to the `FIREWALLS`:
+
+  ![Firewall configuration](../assets/configure-vps-firewall-00.png)
+
+- Select `ADD FIREWALL RULE` and set the following modifications for RustDesk:
+
+  ![Firewall configuration](../assets/configure-vps-firewall-rustdesk-00.png)
+
+- Allow TCP ports `21115-21119` and UDP port `21116` for RustDesk server. See the [port requirements](https://rustdesk.com/docs/en/self-host/rustdesk-server-oss/docker/).
+
+  ![Firewall configuration](../assets/configure-vps-firewall-rustdesk-01.png)
+
+- Save and verify the changes:
+
+  ![Firewall configuration](../assets/configure-vps-firewall-rustdesk-02.png)
 
 #### Create a VPS Instance
 
@@ -174,7 +192,16 @@ sudo podman exec caddy systemctl reload caddy
 
 ## Setup RustDesk Server on VPS Server (Optional)
 
-[RustDesk](https://rustdesk.com/) is a remote desktop software that can be used for other administrative tasks that requires GUI. See [this](https://rustdesk.com/docs/en/self-host/rustdesk-server-oss/docker/#podman-quadlet-examples) for the self-hosted RustDesk setup.
+[RustDesk](https://rustdesk.com/) is a remote desktop software that can be used for other administrative tasks that requires GUI. See [this](https://rustdesk.com/docs/en/self-host/rustdesk-server-oss/docker/) for the self-hosted RustDesk setup.
+
+Allow TCP ports `21115-21119` and UDP port `21116` for RustDesk server. See the [port requirements](https://rustdesk.com/docs/en/self-host/rustdesk-server-oss/docker/).
+
+``` sh
+ZONE='trusted' # change this, see `firewall-cmd --list-all'
+sudo firewall-cmd --permanent --zone="${ZONE}" --add-port=21115-21119/tcp --add-port=21116/udp
+sudo firewall-cmd --reload
+sudo firewall-cmd --list-all
+```
 
 Modify the files `/etc/containers/systemd/rustdesk-id.container`, `/etc/containers/systemd/rustdesk-relay.container`, and `/etc/containers/systemd/rustdesk.volume` with the following contents:
 
