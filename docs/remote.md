@@ -178,6 +178,19 @@ sudo podman exec caddy systemctl reload caddy
 
 Modify the files `/etc/containers/systemd/rustdesk-id.container`, `/etc/containers/systemd/rustdesk-relay.container`, and `/etc/containers/systemd/rustdesk.volume` with the following contents:
 
+https://github.com/kenrendell/hpc-deploy/blob/02e2f3900493693fd6f80ce39cdf2b9a5376fb69/containers/systemd/rustdesk-id.container#L1-L23
+
+https://github.com/kenrendell/hpc-deploy/blob/02e2f3900493693fd6f80ce39cdf2b9a5376fb69/containers/systemd/rustdesk-relay.container#L1-L23
+
+https://github.com/kenrendell/hpc-deploy/blob/02e2f3900493693fd6f80ce39cdf2b9a5376fb69/containers/systemd/rustdesk.volume#L1-L4
+
+Then, reload systemd and start `rustdesk-id` and `rustdesk-relay` services.
+
+``` sh
+sudo systemctl daemon-reload
+sudo systemctl restart rustdesk-id.service
+sudo systemctl restart rustdesk-relay.service
+```
 
 ## Wireguard on the Access Node
 
