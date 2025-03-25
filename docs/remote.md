@@ -172,15 +172,55 @@ sudo podman exec -it caddy vi /etc/caddy/Caddyfile
 sudo podman exec caddy systemctl reload caddy
 ```
 
+## Setup RustDesk Server on VPS Server (Optional)
+
+[RustDesk](https://rustdesk.com/) is a remote desktop software that can be used for other administrative tasks that requires GUI. See [this](https://rustdesk.com/docs/en/self-host/rustdesk-server-oss/docker/#podman-quadlet-examples) for the self-hosted RustDesk setup.
+
+Modify the files `/etc/containers/systemd/rustdesk-id.container`, `/etc/containers/systemd/rustdesk-relay.container`, and `/etc/containers/systemd/rustdesk.volume` with the following contents:
+
+
 ## Wireguard on the Access Node
+
+Install `wireguard-tools`.
 
 ``` sh
 sudo dnf install -y elrepo-release epel-release
 sudo dnf install -y wireguard-tools
 ```
 
+Allow UDP port 51820 for wireguard `wg-quick` service.
+
 ``` sh
 sudo firewall-cmd --permanent --zone=public --add-port=51820/udp
 sudo firewall-cmd --reload
 sudo firewall-cmd --list-all
 ```
+
+Enable `systemd-resolved` service.
+
+``` sh
+sudo systemctl enable systemd-resolved.service
+sudo systemctl restart systemd-resolved.service
+```
+
+Add new client named `CAIN-HPC-Proto` in `wg-easy` web GUI and download the WireGuard configuration for that client.
+
+``` sh
+cat ~/Downloads/CAIN-HPC-Proto.conf | sudo tee /etc/wireguard/CAIN-HPC-Proto.conf
+```
+
+Enable and start the `wg-quick` service of the interface `CAIN-HPC-Proto` to activate the connection.
+
+``` sh
+sudo systemctl enable wg-quick@CAIN-HPC-Proto.service
+sudo systemctl restart wg-quick@CAIN-HPC-Proto.service
+```
+
+Check the connection of the interface `CAIN-HPC-Proto`.
+
+``` sh
+sudo wg showconf CAIN-HPC-Proto
+sudo wg show CAIN-HPC-Proto
+```
+
+Repeat the process for other HPC clients.

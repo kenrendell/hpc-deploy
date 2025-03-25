@@ -1,0 +1,23 @@
+[Unit]
+Description=RustDesk ID Server Container
+
+[Container]
+ContainerName=rustdesk-id
+AutoUpdate=registry
+Image=ghcr.io/rustdesk/rustdesk-server:latest
+Exec=hbbs
+Network=host
+
+# Create and modify the `/etc/containers/systemd/rustdesk.volume' file.
+# See `[Volume]' in `podman-systemd.unit' manual.
+Volume=rustdesk.volume:/root
+
+[Service]
+Restart=always
+
+# Extend Timeout to allow time to pull the image
+TimeoutStartSec=900
+
+[Install]
+# Start by default on boot
+WantedBy=multi-user.target default.target
