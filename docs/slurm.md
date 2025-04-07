@@ -227,7 +227,7 @@ Modify the file `/etc/slurm/slurm.conf` with the following modifications.
 
 ``` text
 ClusterName=cain-hpc-proto
-SlurmctldHost=cain-hpc-proto
+SlurmctldHost=cain-hpc-proto.localdomain
 SlurmctldAddr=10.0.0.1
 SlurmUser=slurm
 
@@ -244,7 +244,7 @@ SelectTypeParameters=CR_CPU_Memory
 ReturnToService=2
 
 NodeName=n[1-4] NodeAddr=10.0.2.[1-4] CPUs=4 CoresPerSocket=2 ThreadsPerCore=2 RealMemory=7873 MemSpecLimit=2048 TmpDisk=2048
-NodeName=n5 NodeAddr=10.0.2.5 CPUs=8 CoresPerSocket=4 ThreadsPerCore=2 RealMemory=7873 MemSpecLimit=2048 TmpDisk=2048
+NodeName=n5 NodeAddr=10.0.2.5 CPUs=8 CoresPerSocket=4 ThreadsPerCore=2 RealMemory=7869 MemSpecLimit=2048 TmpDisk=2048
 
 PartitionName=debug Nodes=ALL Default=YES MaxTime=INFINITE State=UP
 ```
@@ -347,3 +347,50 @@ Then, reboot the nodes. To print the node configuration, run the following comma
 ``` sh
 sudo wwctl ssh n[1-5] -- slurmd -C
 ```
+
+### Making changes on Slurm
+
+Recommended process for adding a node or configuring Slurm:
+
+- Stop the `slurmctld` systemd service on the control node.
+
+  ``` sh
+  sudo systemctl stop slurmctld.service
+  ```
+
+- Update Slurm and propagate the changes on `slurm.conf` file or any slurm-related files from the control node to all nodes in the cluster.
+
+  ``` sh
+  sudo wwctl container shell --bind /:/mnt 'rockylinux-8'
+  ```
+
+  Copy the file `/etc/slurm/slurm.conf` from the control node to the container.
+
+  ``` sh
+  command cp -fp /mnt/etc/slurm/slurm.conf /mnt/etc/slurm/cgroup.conf /etc/slurm
+  exit 0
+  ```
+
+  Always rebuild overlays manually after changes to the cluster.
+
+  ``` sh
+  sudo wwctl overlay build
+  ```
+
+- Restart the `slurmd` systemd service on all nodes.
+
+  > Reboot the nodes. No need to restart `slurmd` systemd service on all compute nodes.
+
+- Restart the `slurmctld` systemd service on the control node.
+
+  ``` sh
+  sudo systemctl restart slurmctld.service
+  ```
+
+Interoperability is guaranteed between three consecutive versions of Slurm, with the following restrictions:
+
+- The version of `slurmdbd` must be identical to or higher than the version of `slurmctld`.
+- The version of `slurmctld` must the identical to or higher than the version of `slurmd`.
+- The version of `slurmd` must be identical to or higher than the version of the Slurm user applications.
+
+> In short: version(`slurmdbd`) >= version(`slurmctld`) >= version(`slurmd`) >= version(Slurm user CLIs)

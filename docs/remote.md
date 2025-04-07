@@ -219,6 +219,14 @@ sudo systemctl restart rustdesk-id.service
 sudo systemctl restart rustdesk-relay.service
 ```
 
+For RustDesk clients, the key can be viewed by the following command:
+
+``` sh
+sudo podman volume inspect --format={{.Mountpoint}} systemd-rustdesk | sudo xargs -I @ cat @/id_ed25519.pub | tee ~/rustdesk.key
+```
+
+Then, copy the file `~/rustdesk.key` and paste to RustDesk clients.
+
 ## Wireguard on the Access Node
 
 Install `wireguard-tools`.
