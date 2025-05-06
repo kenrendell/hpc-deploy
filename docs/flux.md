@@ -217,10 +217,13 @@ sudo wwctl ssh n[1-5] -- echo "$(munge -n)" \| unmunge
 
 Install [flux-core](https://github.com/flux-framework/flux-core), [flux-security](https://github.com/flux-framework/flux-security), [flux-sched](https://github.com/flux-framework/flux-sched), and [flux-pmix](https://github.com/flux-framework/flux-pmix) on the control node (and compute nodes) using [spack](package-manager.md) package manager. See [this](https://flux-framework.readthedocs.io/projects/flux-core/en/latest/guide/admin.html#installing-software-packages) and [this](https://flux-framework.readthedocs.io/projects/flux-core/en/latest/index.html) one. The following command also installs `flux-core` and `flux-security`:
 
+> After this step, do not remove the Spack caches (i.e., the source packages downloaded by Spack), as rebuilding will occur on the compute nodes to match their specific architectures. Since the compute nodes do not have internet access, they depend on the cached archives downloaded by the control node. If a compute node requires an additional dependency during rebuilding, use the control node to fetch it via `spack fetch`, or `spack fetch --deprecated` if the package is deprecated.
+
 ``` sh
 spack install gcc@14.2.0
-spack install flux-sched +cuda+docs %gcc@14.2.0 ^flux-core +security+cuda+docs %gcc@14.2.0
-spack install --reuse flux-pmix %gcc@14.2.0 ^flux-core +security+cuda+docs %gcc@14.2.0
+spack install flux-core +cuda+docs+security %gcc@14.2.0
+spack install --reuse flux-sched +cuda+docs+ipo %gcc@14.2.0 ^flux-core +cuda+docs+security %gcc@14.2.0
+spack install --reuse flux-pmix %gcc@14.2.0 ^flux-core +cuda+docs+security %gcc@14.2.0
 ```
 
 > For OpenMPI support, install `flux-pmix`.
@@ -270,11 +273,11 @@ sudo wwctl container shell --bind /:/mnt 'rockylinux-8'
 In compute node, install `slurmd`.
 
 ``` sh
-dnf install -y dnf-plugins-core
-dnf config-manager --set-enabled powertools
-dnf install -y rocky-release-hpc
-dnf install -y slurm23.11-slurmd
-dnf install -y openmpi
+dnf remove -y dnf-plugins-core
+dnf config-manager --set-disabled powertools
+dnf remove -y rocky-release-hpc
+dnf remove -y slurm23.11-slurmd
+dnf remove -y openmpi
 ```
 
 Create directories `/etc/slurm`, `/var/run/slurm`, `/var/spool/slurm`, and `/var/log/slurm`. Then, change the ownership of created directories to `SlurmUser`.
@@ -293,7 +296,7 @@ command cp -fp /mnt/etc/slurm/slurm.conf /mnt/etc/slurm/cgroup.conf /etc/slurm
 Enable the `slurmd` service.
 
 ``` sh
-systemctl enable slurmd.service
+systemctl disable slurmd.service
 ```
 
 Exit Warewulf container shell with 0 exit status to force a rebuild.

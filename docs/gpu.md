@@ -42,14 +42,15 @@ Install NVIDIA GPU drivers.
 
 ``` sh
 dnf config-manager --add-repo "http://developer.download.nvidia.com/compute/cuda/repos/rhel8/$(uname -i)/cuda-rhel8.repo"
-dnf install -y kernel-headers kernel-devel tar bzip2 make automake gcc gcc-c++ pciutils elfutils-libelf-devel libglvnd-opengl libglvnd-glx libglvnd-devel acpid pkgconf dkms
+dnf install -y kernel-{core,devel,headers,modules-extra} tar bzip2 make automake gcc gcc-c++ pciutils elfutils-libelf-devel libglvnd-opengl libglvnd-glx libglvnd-devel acpid pkgconf dkms
+dnf remove -y $(dnf repoquery --installonly --latest-limit=-1 --quiet)
 dnf module install -y nvidia-driver:latest-dkms
 ```
 
-Remove build dependencies to prevent the image from becoming too large to boot properly. Install them only when upgrading the NVIDIA GPU drivers.
+Build and install `nvidia` module with `dkms`.
 
 ``` sh
-dnf groupremove -y 'Development Tools'
+for module in $(dkms status | grep -o '^[^:]*'); do for kernel in $(cd /lib/modules; ls); do dkms build "${module}" -k "${kernel}" && dkms install "${module}" -k "${kernel}"; done; done
 ```
 
 [Nouveau](https://nouveau.freedesktop.org/) is an open-source NVIDIA driver that provides limited functionality compared to NVIDIA's proprietary drivers. It is best to disable it to avoid driver conflicts.

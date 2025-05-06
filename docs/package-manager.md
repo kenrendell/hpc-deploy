@@ -35,7 +35,6 @@ sudo userdel --remove "${GROUP}"
 To install `spack` package, make sure that the [minimum requirements](https://spack.readthedocs.io/en/latest/getting_started.html#system-prerequisites) are met.
 
 ``` sh
-sudo dnf install -y python3 git
 sudo dnf install -y epel-release
 sudo dnf groupinstall -y "Development Tools"
 sudo dnf install -y gcc-gfortran redhat-lsb-core python3 unzip
@@ -55,6 +54,22 @@ Restart the session to setup the environment for `spack`. Then, configure the `b
 ``` sh
 spack config add config:build_stage:'$user_cache_path/stage'
 spack config blame config # see changes
+```
+
+#### On Compute Nodes
+
+Copy the file `/etc/profile.d/spack.sh` from the control node to the compute nodes.
+
+``` sh
+sudo wwctl container shell --bind /:/mnt 'rockylinux-8'
+command cp -fp /mnt/etc/profile.d/spack.sh /etc/profile.d
+exit 0
+```
+
+Always rebuild overlays manually after changes to the cluster. Then, [restart](provision.md) the compute nodes.
+
+``` sh
+sudo wwctl overlay build
 ```
 
 #### Spack Usage
