@@ -71,5 +71,3 @@ Always rebuild overlays manually after changes to the cluster. Then, [restart](p
 ``` sh
 sudo wwctl overlay build
 ```
-
-#### Spack Usage

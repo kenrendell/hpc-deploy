@@ -98,6 +98,8 @@ wireguard
 xt_MASQUERADE
 ```
 
+Restart the VPS Server to load the necessary modules before continuing to the Wireguard GUI setup.
+
 Pull the `wg-easy` image to avoid waiting for systemd process to start.
 
 ``` sh

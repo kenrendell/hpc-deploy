@@ -1,5 +1,7 @@
 # Node Provisioning
 
+Before proceeding to the following instructions, `Rocky Linux 8` operating system must be installed on the control/access node, see [this guide](https://rldocs.readthedocs.io/en/latest/guides/rocky-8-installation/) for more information about installing `Rocky Linux 8` on the server.
+
 ## Install Warewulf
 
 Install [Warewulf](https://warewulf.org/) on the control/access node. The preferred way to install Warewulf on Enterprise Linux is using the RPMs published in [GitHub releases](https://github.com/warewulf/warewulf/releases).
