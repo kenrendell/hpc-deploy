@@ -72,7 +72,7 @@ To remotely access a server, it must be internet-accessible, typically via a sta
 
   ![VPS configuration](../assets/configure-vps-05.png)
 
-## Setup Wireguard VPN on VPS Server
+## Setup WireGuard VPN on VPS Server
 
 Update the system and install `wireguard-tools` and `podman`.
 
@@ -98,7 +98,7 @@ wireguard
 xt_MASQUERADE
 ```
 
-Restart the VPS Server to load the necessary modules before continuing to the Wireguard GUI setup.
+Restart the VPS Server to load the necessary modules before continuing to the WireGuard GUI setup.
 
 Pull the `wg-easy` image to avoid waiting for systemd process to start.
 
@@ -221,15 +221,9 @@ sudo systemctl restart rustdesk-id.service
 sudo systemctl restart rustdesk-relay.service
 ```
 
-For RustDesk clients, the key can be viewed by the following command:
+## Client Remote Access
 
-``` sh
-sudo podman volume inspect --format={{.Mountpoint}} systemd-rustdesk | sudo xargs -I @ cat @/id_ed25519.pub | tee ~/rustdesk.key
-```
-
-Then, copy the file `~/rustdesk.key` and paste to RustDesk clients.
-
-## Wireguard on the Access Node
+### WireGuard
 
 Install `wireguard-tools`.
 
@@ -274,3 +268,19 @@ sudo wg show CAIN-HPC-Proto
 ```
 
 Repeat the process for other HPC clients.
+
+### RustDesk (Optional)
+
+> RustDesk doesn't require WireGuard VPN tunnel.
+
+For RustDesk clients, the key can be viewed on the VPS server (where the RustDesk server is hosted) by the following command:
+
+``` sh
+sudo podman volume inspect --format={{.Mountpoint}} systemd-rustdesk | sudo xargs -I @ cat @/id_ed25519.pub | tee ~/rustdesk.key
+```
+
+Then, copy the file `~/rustdesk.key` and paste to RustDesk clients including the IP address of the RustDesk Server.
+
+### TigerVNC (Optional)
+
+> TigerVNC optionally requires WireGuard for secure connection.
